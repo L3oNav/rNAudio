@@ -1,8 +1,35 @@
-[package]
-name = "l3o-audio"
+[workspace]
+resolver = "3"
+members = [
+    "crates/l3o-core",
+    "crates/l3o-dsp",
+    "crates/l3o-io",
+    "crates/l3o-engine",
+    "crates/l3o-platform",
+    "crates/l3o-daemon",
+    "crates/l3o-cli",
+    "xtask",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
 
-[dependencies]
-cpal = "0.18.2"
+[workspace.dependencies]
+# Audio I/O
+cpal = "0.16"        # must stay in sync with flexaudio's cpal to avoid the alsa-sys links conflict
 flexaudio = "0.8.1"
+
+# Application
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Real-time plumbing (wired up in M1)
+rtrb = "0.3"
+rubato = "3"

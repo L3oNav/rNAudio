@@ -1,0 +1,18 @@
+[package]
+name = "l3o-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "l3o"
+path = "src/main.rs"
+
+[dependencies]
+l3o-core = { path = "../l3o-core" }
+l3o-io = { path = "../l3o-io" }
+l3o-platform = { path = "../l3o-platform" }
+clap.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

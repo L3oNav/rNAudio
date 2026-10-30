@@ -2,7 +2,7 @@
 
 **A cross-platform Rust audio mixer / DSP suite: Easy Effects-style processing plus SteelSeries Sonar-style channel routing and Streamer Mode.**
 
-Status: planning
+Status: M0 complete (workspace, dev shell, smoke tests)
 Target platforms: Linux (primary), macOS, Windows
 Last updated: 2026-10-30
 
@@ -17,7 +17,7 @@ Findings that shape the design:
 
 - **`flexaudio` 0.8.1 is capture-only** (microphone, system loopback, per-process) on Linux/Windows/macOS, MIT licensed. It does not play audio and does not create devices.
 - **The dependency graph does not resolve today**: `flexaudio` pulls `cpal 0.16` (`alsa-sys 0.3`), while the project declares `cpal 0.18.2` (`alsa-sys 0.4`). Cargo fails on the `links = "alsa"` conflict.
-- **Fix:** pin `cpal = "0.16"` (or drop the direct dependency and use the version flexaudio brings in). This is a prerequisite for any code.
+- **Fix (done in M0):** the workspace pins `cpal = "0.16"`, the version flexaudio uses, so `alsa-sys` is unified. The root manifest is now the virtual workspace.
 
 ---
 

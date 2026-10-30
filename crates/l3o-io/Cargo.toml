@@ -1,0 +1,12 @@
+[package]
+name = "l3o-io"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+l3o-core = { path = "../l3o-core" }
+cpal.workspace = true
+flexaudio.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
