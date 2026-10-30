@@ -1,0 +1,8 @@
+[package]
+name = "l3o-audio"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cpal = "0.18.2"
+flexaudio = "0.8.1"
