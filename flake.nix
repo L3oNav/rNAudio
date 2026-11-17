@@ -30,6 +30,7 @@
 
             shellHook = ''
               export LIBCLANG_PATH="${pkgs.llvmPackages.libclang.lib}/lib"
+              export PATH="$PWD/target/debug:$PATH"
             '';
           };
         });

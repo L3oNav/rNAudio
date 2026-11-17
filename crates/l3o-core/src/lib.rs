@@ -9,6 +9,12 @@ pub mod gain;
 
 pub use gain::{db_to_linear, linear_to_db};
 
+/// Maximum supported per-bus/master gain, in dB.
+pub const MAX_GAIN_DB: f32 = 24.0;
+
+/// Minimum supported per-bus/master gain, in dB.
+pub const MIN_GAIN_DB: f32 = -144.0;
+
 /// Everything inside the engine runs at this rate. Device rates are converted
 /// at the I/O boundary.
 pub const CANONICAL_SAMPLE_RATE: u32 = 48_000;
@@ -194,6 +200,25 @@ impl Preset {
         }
     }
 
+    /// Validates everything the engine needs before it can run.
+    ///
+    /// Rejects duplicate bus IDs and non-finite or out-of-range gains so the
+    /// audio callback never sees malformed state.
+    pub fn validate(&self) -> Result<(), PresetError> {
+        let mut ids = std::collections::BTreeSet::new();
+        for bus in &self.buses {
+            if !ids.insert(bus.id.0) {
+                return Err(PresetError::DuplicateBusId(bus.id.0));
+            }
+            check_gain("bus gain", bus.gain_db)?;
+            check_gain("monitor send", bus.sends.monitor.gain_db)?;
+            check_gain("stream send", bus.sends.stream.gain_db)?;
+        }
+        check_gain("master monitor gain", self.master.monitor_gain_db)?;
+        check_gain("master stream gain", self.master.stream_gain_db)?;
+        Ok(())
+    }
+
     pub fn bus(&self, id: BusId) -> Option<&Bus> {
         self.buses.iter().find(|bus| bus.id == id)
     }
@@ -201,6 +226,23 @@ impl Preset {
     pub fn bus_mut(&mut self, id: BusId) -> Option<&mut Bus> {
         self.buses.iter_mut().find(|bus| bus.id == id)
     }
+}
+
+fn check_gain(what: &str, db: f32) -> Result<(), PresetError> {
+    if !db.is_finite() || !(MIN_GAIN_DB..=MAX_GAIN_DB).contains(&db) {
+        return Err(PresetError::InvalidGain(format!("{what}: {db}")));
+    }
+    Ok(())
+}
+
+/// Why a preset cannot be used by the engine.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+pub enum PresetError {
+    #[error("duplicate bus id: {0}")]
+    DuplicateBusId(u32),
+
+    #[error("invalid gain: {0}")]
+    InvalidGain(String),
 }
 
 impl Default for Preset {
@@ -251,5 +293,34 @@ mod tests {
         assert_eq!(preset.bus(BusId(2)).unwrap().name, "Media");
         preset.bus_mut(BusId(2)).unwrap().name = "Music".into();
         assert_eq!(preset.bus(BusId(2)).unwrap().name, "Music");
+    }
+
+    #[test]
+    fn validate_accepts_default_layout() {
+        assert_eq!(Preset::default().validate(), Ok(()));
+    }
+
+    #[test]
+    fn validate_rejects_duplicate_bus_ids() {
+        let mut preset = Preset::default();
+        preset.buses.push(Bus::new(0, "Duplicate"));
+        assert_eq!(preset.validate(), Err(PresetError::DuplicateBusId(0)));
+    }
+
+    #[test]
+    fn validate_rejects_non_finite_and_out_of_range_gains() {
+        let mut preset = Preset::default();
+        preset.buses[0].gain_db = f32::NAN;
+        assert!(matches!(
+            preset.validate(),
+            Err(PresetError::InvalidGain(_))
+        ));
+
+        let mut preset = Preset::default();
+        preset.master.stream_gain_db = 60.0;
+        assert!(matches!(
+            preset.validate(),
+            Err(PresetError::InvalidGain(_))
+        ));
     }
 }

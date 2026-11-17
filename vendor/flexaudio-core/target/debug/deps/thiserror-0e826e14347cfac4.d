@@ -1,0 +1,14 @@
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/deps/thiserror-0e826e14347cfac4.d: /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs /home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/build/thiserror-9ce2e6987433e2b4/out/private.rs
+
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/deps/libthiserror-0e826e14347cfac4.rlib: /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs /home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/build/thiserror-9ce2e6987433e2b4/out/private.rs
+
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/deps/libthiserror-0e826e14347cfac4.rmeta: /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs /home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/build/thiserror-9ce2e6987433e2b4/out/private.rs
+
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/lib.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/aserror.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/display.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/var.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.21/src/private.rs:
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/build/thiserror-9ce2e6987433e2b4/out/private.rs:
+
+# env-dep:OUT_DIR=/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/build/thiserror-9ce2e6987433e2b4/out

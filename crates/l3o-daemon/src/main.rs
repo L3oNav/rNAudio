@@ -1,9 +1,14 @@
 //! `l3od` — the L3O Audio engine daemon.
 //!
-//! M0 stub: it detects the platform backend and exits. The real-time engine and
-//! the IPC control socket arrive in M1/M5.
+//! Long-lived headless process: owns the mixer engine and exposes a
+//! user-session Unix socket for local control. No network listener, no
+//! elevated privileges, no client required.
 
 use std::process::ExitCode;
+use std::sync::{Arc, Mutex};
+
+use l3o_daemon::daemon::Daemon;
+use l3o_daemon::server;
 
 fn main() -> ExitCode {
     tracing_subscriber::fmt()
@@ -13,12 +18,19 @@ fn main() -> ExitCode {
         )
         .init();
 
-    let backend = l3o_platform::detect();
-    tracing::info!(backend = backend.name(), "l3od starting");
+    let path = server::socket_path();
+    let listener = match server::bind(&path) {
+        Ok(listener) => listener,
+        Err(err) => {
+            eprintln!(
+                "error: cannot bind control socket {}: {err}",
+                path.display()
+            );
+            return ExitCode::FAILURE;
+        }
+    };
+    tracing::info!(socket = %path.display(), "l3od listening");
 
-    println!("l3od {} (M0 stub)", env!("CARGO_PKG_VERSION"));
-    println!("platform backend: {}", backend.name());
-    println!("engine: not wired yet (M1)");
-
-    ExitCode::SUCCESS
+    let daemon = Arc::new(Mutex::new(Daemon::new(128)));
+    server::serve(listener, daemon)
 }

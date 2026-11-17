@@ -434,8 +434,6 @@ dependencies = [
 [[package]]
 name = "flexaudio-core"
 version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9677df7b2ff46d7897702c3f64a3a146a8a66633ec5d8f30af9b2ed717462f48"
 dependencies = [
  "bitflags 2.13.2",
  "ringbuf",
@@ -581,6 +579,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "itoa"
+version = "1.0.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
+
+[[package]]
 name = "jni"
 version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -641,6 +645,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "l3o-core",
+ "l3o-daemon",
  "l3o-io",
  "l3o-platform",
  "thiserror 2.0.21",
@@ -664,6 +669,10 @@ dependencies = [
  "l3o-engine",
  "l3o-io",
  "l3o-platform",
+ "libc",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
  "tracing",
  "tracing-subscriber",
 ]
@@ -681,6 +690,7 @@ version = "0.1.0"
 dependencies = [
  "l3o-core",
  "l3o-dsp",
+ "rtrb",
  "thiserror 2.0.21",
 ]
 
@@ -691,6 +701,9 @@ dependencies = [
  "cpal",
  "flexaudio",
  "l3o-core",
+ "l3o-engine",
+ "rtrb",
+ "serde",
  "thiserror 2.0.21",
  "tracing",
 ]
@@ -1185,9 +1198,9 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "ringbuf"
-version = "0.4.8"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe47b720588c8702e34b5979cb3271a8b1842c7cb6f57408efa70c779363488c"
+checksum = "33d5f59e4145df5f29e84b6389394a8a3fedf7bd8c12570560ae67a917e6eae3"
 dependencies = [
  "crossbeam-utils",
  "portable-atomic",
@@ -1298,6 +1311,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
+]
+
+[[package]]
+name = "serde_json"
+version = "1.0.154"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7e9cc8b1b85264074fbcc02a88680c4096b1e47df8f739dceb03bf482f04bd6"
+dependencies = [
+ "itoa",
+ "memchr",
+ "serde",
+ "serde_core",
+ "zmij",
 ]
 
 [[package]]
@@ -1919,3 +1945,9 @@ dependencies = [
 [[package]]
 name = "xtask"
 version = "0.1.0"
+
+[[package]]
+name = "zmij"
+version = "1.0.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"

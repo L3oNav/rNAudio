@@ -1,0 +1,10 @@
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/deps/audioadapter_sample-6f364ea8bd18dfc5.d: /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/lib.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/sample.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/readwrite.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/../README.md
+
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/deps/libaudioadapter_sample-6f364ea8bd18dfc5.rlib: /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/lib.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/sample.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/readwrite.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/../README.md
+
+/home/comrade/projects/L3oAudio/vendor/flexaudio-core/target/debug/deps/libaudioadapter_sample-6f364ea8bd18dfc5.rmeta: /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/lib.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/sample.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/readwrite.rs /home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/../README.md
+
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/lib.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/sample.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/readwrite.rs:
+/home/comrade/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/audioadapter-sample-3.0.0/src/../README.md:

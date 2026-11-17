@@ -6,7 +6,10 @@ license.workspace = true
 
 [dependencies]
 l3o-core = { path = "../l3o-core" }
+l3o-engine = { path = "../l3o-engine" }
 cpal.workspace = true
 flexaudio.workspace = true
+rtrb.workspace = true
+serde = { workspace = true, features = ["derive"] }
 thiserror.workspace = true
 tracing.workspace = true

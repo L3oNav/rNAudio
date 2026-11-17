@@ -8,10 +8,17 @@ license.workspace = true
 name = "l3od"
 path = "src/main.rs"
 
+[lib]
+name = "l3o_daemon"
+
 [dependencies]
 l3o-core = { path = "../l3o-core" }
 l3o-engine = { path = "../l3o-engine" }
 l3o-io = { path = "../l3o-io" }
 l3o-platform = { path = "../l3o-platform" }
+libc = "0.2"
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true

@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -11,18 +14,21 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y pkg-config clang libclang-dev libpipewire-0.3-dev libasound2-dev
 
-      - uses: dtolnay/rust-toolchain@stable
+      # dtolnay/rust-toolchain stable
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca
         with:
-          components: rustfmt, clippy
+          components: rustfmt, clippy, llvm-tools-preview
 
-      - uses: Swatinem/rust-cache@v2
+      # Swatinem/rust-cache v2.8.2
+      - uses: Swatinem/rust-cache@401aff9a7a08acb9d27b64936a90db81024cff97
 
       - name: Format
         run: cargo fmt --all -- --check
@@ -30,18 +36,52 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
 
+      - name: Exactly one alsa-sys
+        run: test "$(cargo tree --prefix none -i alsa-sys | grep -c '^alsa-sys')" -eq 1
+
       - name: Test
         run: cargo test --workspace
 
+      # taiki-e/install-action v2
+      - uses: taiki-e/install-action@ab49d3c64680143e184118bed66a46419fc15519
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Coverage
+        # Reports coverage; the 80% workspace gate is enforced at phase gates.
+        run: cargo llvm-cov --workspace --all-targets --summary-only
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      # EmbarkStudios/cargo-deny-action v2.0.11
+      - uses: EmbarkStudios/cargo-deny-action@9b7d65878c2d28c8e3c16e30bf555c29abe505bd
+
   check:
-    name: check (${{ matrix.os }})
+    name: test and compile (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo check --workspace
+      # actions/checkout v4.3.1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      # dtolnay/rust-toolchain stable
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca
+
+      # Swatinem/rust-cache v2.8.2
+      - uses: Swatinem/rust-cache@401aff9a7a08acb9d27b64936a90db81024cff97
+
+      - name: Fetch dependencies
+        run: cargo fetch --locked
+
+      - name: Test offline
+        run: cargo test --offline --workspace
+
+      - name: Compile
+        run: cargo check --offline --workspace --all-targets

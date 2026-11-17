@@ -7,4 +7,5 @@ license.workspace = true
 [dependencies]
 l3o-core = { path = "../l3o-core" }
 l3o-dsp = { path = "../l3o-dsp" }
+rtrb.workspace = true
 thiserror.workspace = true

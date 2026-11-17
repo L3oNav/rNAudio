@@ -39,27 +39,37 @@ pub trait Processor: Send {
 }
 
 /// A gain node with click-free parameter changes.
+///
+/// Changes ramp linearly from the current value to the target over the
+/// configured duration (5–20 ms in engine use), so there is never a
+/// per-sample discontinuity.
 pub struct Gain {
     current: f32,
     target: f32,
-    smoothing: f32,
+    step: f32,
+    ramp_frames: f32,
 }
 
 impl Gain {
-    /// `smoothing_ms` is the time constant of the exponential ramp.
+    /// `smoothing_ms` is the ramp duration from old to new value.
     pub fn new(sample_rate: u32, smoothing_ms: f32) -> Self {
         let mut gain = Self {
             current: 1.0,
             target: 1.0,
-            smoothing: 0.0,
+            step: 0.0,
+            ramp_frames: 1.0,
         };
         gain.set_smoothing(sample_rate, smoothing_ms);
         gain
     }
 
     fn set_smoothing(&mut self, sample_rate: u32, smoothing_ms: f32) {
-        let tau = (smoothing_ms / 1000.0).max(1e-4);
-        self.smoothing = 1.0 - (-1.0 / (tau * sample_rate as f32)).exp();
+        self.ramp_frames = (smoothing_ms.max(0.1) / 1000.0 * sample_rate as f32).max(1.0);
+        self.update_step();
+    }
+
+    fn update_step(&mut self) {
+        self.step = (self.target - self.current) / self.ramp_frames;
     }
 
     pub fn set_gain_db(&mut self, db: f32) {
@@ -68,6 +78,7 @@ impl Gain {
 
     pub fn set_target(&mut self, linear: f32) {
         self.target = linear.clamp(0.0, 16.0);
+        self.update_step();
     }
 
     pub fn current(&self) -> f32 {
@@ -85,19 +96,22 @@ impl Processor for Gain {
     }
 
     fn process(&mut self, block: &mut AudioBlock<'_>) {
-        if (self.current - self.target).abs() < 1e-6 {
-            self.current = self.target;
-            if self.current == 1.0 {
-                return;
-            }
-            for sample in block.data.iter_mut() {
-                *sample *= self.current;
+        if self.step == 0.0 {
+            if self.current != 1.0 {
+                for sample in block.data.iter_mut() {
+                    *sample *= self.current;
+                }
             }
             return;
         }
 
+        let limit = self.step.abs();
         for frame in block.data.chunks_mut(block.channels) {
-            self.current += (self.target - self.current) * self.smoothing;
+            let diff = self.target - self.current;
+            self.current += diff.clamp(-limit, limit);
+            if self.current == self.target {
+                self.step = 0.0;
+            }
             for sample in frame {
                 *sample *= self.current;
             }
@@ -106,6 +120,7 @@ impl Processor for Gain {
 
     fn reset(&mut self) {
         self.current = self.target;
+        self.step = 0.0;
     }
 }
 

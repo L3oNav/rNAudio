@@ -6,14 +6,23 @@
 //! copy of `alsa-sys` is linked.
 
 pub mod capture;
+pub mod convert;
+pub mod graph;
 pub mod output;
+pub mod run;
 
 pub use capture::{
     CaptureDeviceInfo, ProcessEntry, capabilities_report, list_capture_devices, list_processes,
 };
+pub use convert::{ConvertError, LinearResampler, adapt_channels, to_device_samples};
+pub use graph::{
+    CaptureChunk, RenderGraph, RenderStats, RenderStatsSnapshot, SourceSnapshot, SourceTelemetry,
+    chunk_queue,
+};
 pub use output::{
     OutputDeviceInfo, OutputSummary, describe_output, list_output_devices, play_tone,
 };
+pub use run::{DeviceRun, start as start_device_run};
 
 /// Errors produced by the I/O layer.
 #[derive(Debug, thiserror::Error)]

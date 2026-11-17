@@ -1,14 +1,14 @@
 [workspace]
 resolver = "3"
 members = [
-    "crates/l3o-core",
-    "crates/l3o-dsp",
-    "crates/l3o-io",
-    "crates/l3o-engine",
-    "crates/l3o-platform",
-    "crates/l3o-daemon",
-    "crates/l3o-cli",
-    "xtask",
+  "crates/l3o-core",
+  "crates/l3o-dsp",
+  "crates/l3o-io",
+  "crates/l3o-engine",
+  "crates/l3o-platform",
+  "crates/l3o-daemon",
+  "crates/l3o-cli",
+  "xtask",
 ]
 
 [workspace.package]
@@ -19,12 +19,13 @@ license = "MIT OR Apache-2.0"
 
 [workspace.dependencies]
 # Audio I/O
-cpal = "0.16"        # must stay in sync with flexaudio's cpal to avoid the alsa-sys links conflict
+cpal = "0.16"       # must stay in sync with flexaudio's cpal to avoid the alsa-sys links conflict
 flexaudio = "0.8.1"
 
 # Application
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 thiserror = "2"
 toml = "0.8"
 tracing = "0.1"
@@ -33,3 +34,12 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Real-time plumbing (wired up in M1)
 rtrb = "0.3"
 rubato = "3"
+
+# Reviewed MIT fork of flexaudio-core 0.8.1 with ringbuf bumped from the
+# vulnerable ^0.4 line to 0.6 (RUSTSEC-2026-0293 is fixed in ringbuf >= 0.5.2).
+# Code changes vs upstream: the ringbuf dependency line, plus trait imports
+# trimmed to `Observer` in chunk_ring.rs/secondary_ring.rs (ringbuf 0.6 makes
+# the other methods inherent). Drop this patch once flexaudio publishes a
+# release with ringbuf >= 0.5.2.
+[patch.crates-io]
+flexaudio-core = { path = "vendor/flexaudio-core" }

@@ -46,8 +46,121 @@ enum Command {
         #[arg(long)]
         device: Option<String>,
     },
-    /// Show the detected platform backend.
+    /// Show the detected platform backend and daemon state.
     Status,
+    /// Control the l3od daemon over its local socket.
+    Daemon {
+        #[command(subcommand)]
+        command: DaemonCommand,
+    },
+}
+
+#[derive(Debug, Subcommand)]
+enum DaemonCommand {
+    /// Show daemon status.
+    Status,
+    /// Start the engine.
+    Start,
+    /// Stop the engine.
+    Stop,
+    /// Set a bus gain/mute.
+    SetBus {
+        /// Bus ID (see `l3o devices` and the default layout).
+        id: u32,
+        /// Gain in dB.
+        #[arg(long, default_value_t = 0.0)]
+        gain_db: f32,
+        /// Mute the bus.
+        #[arg(long)]
+        mute: bool,
+    },
+    /// Set a bus send.
+    SetSend {
+        /// Bus ID.
+        id: u32,
+        /// Mix: monitor or stream.
+        #[arg(long, value_parser = ["monitor", "stream"])]
+        mix: String,
+        /// Send gain in dB.
+        #[arg(long, default_value_t = 0.0)]
+        gain_db: f32,
+        /// Disable the send.
+        #[arg(long)]
+        off: bool,
+    },
+    /// Set master gains/mutes.
+    SetMaster {
+        #[arg(long, default_value_t = 0.0)]
+        monitor_gain_db: f32,
+        #[arg(long, default_value_t = 0.0)]
+        stream_gain_db: f32,
+        #[arg(long)]
+        monitor_mute: bool,
+        #[arg(long)]
+        stream_mute: bool,
+    },
+}
+
+fn daemon_request(request: l3o_daemon::ipc::Request) -> Result<(), Box<dyn std::error::Error>> {
+    use l3o_daemon::ipc::{PROTOCOL_VERSION, RequestFrame, ResponseFrame};
+    use l3o_daemon::server;
+    let frame = RequestFrame {
+        version: PROTOCOL_VERSION,
+        seq: 1,
+        request,
+    };
+    let socket = server::socket_path();
+    let response: ResponseFrame = server::request(&socket, &frame)?;
+    if response.ok {
+        if let Some(status) = response.status {
+            println!(
+                "engine: {}",
+                match status.engine {
+                    l3o_daemon::ipc::EngineState::Stopped => "stopped",
+                    l3o_daemon::ipc::EngineState::Running => "running",
+                    l3o_daemon::ipc::EngineState::Failed => "failed",
+                }
+            );
+            if let Some(stats) = status.stats {
+                println!(
+                    "blocks: {}  callback avg/max: {} / {} ns  source underruns: {}",
+                    stats.blocks_rendered,
+                    stats.callback_nanos_avg,
+                    stats.callback_nanos_max,
+                    stats.source_underflows
+                );
+            }
+            if let Some(latency) = status.engine_latency_ms {
+                println!("engine latency: {latency:.2} ms (device buffer excluded)");
+            }
+            if let Some(sources) = status.sources {
+                for s in sources {
+                    println!(
+                        "  bus {:<2} peak {:6.3}  rms {:6.3}  underflows {:>4}  {}{}",
+                        s.bus,
+                        s.peak,
+                        s.rms,
+                        s.underflows,
+                        if s.stalled { "STALLED " } else { "" },
+                        if s.queue_fill > 0 {
+                            format!("queue {}", s.queue_fill)
+                        } else {
+                            String::new()
+                        },
+                    );
+                }
+            }
+        } else {
+            println!("ok");
+        }
+        Ok(())
+    } else {
+        let error = response.error.unwrap_or(l3o_daemon::ipc::ErrorReport {
+            code: l3o_daemon::ipc::ErrorCode::Internal,
+            message: "unknown error".into(),
+        });
+        Err(format!("{} ({:?})", error.message, error.code).into())
+    }
 }
 
 fn main() -> ExitCode {
@@ -95,6 +208,48 @@ fn run(command: Option<Command>) -> Result<(), Box<dyn std::error::Error>> {
             println!("M0 smoke tests: l3o devices | processes | caps | tone | latency");
             Ok(())
         }
+        Command::Daemon { command } => match command {
+            DaemonCommand::Status => daemon_request(l3o_daemon::ipc::Request::Status),
+            DaemonCommand::Start => daemon_request(l3o_daemon::ipc::Request::EngineStart),
+            DaemonCommand::Stop => daemon_request(l3o_daemon::ipc::Request::EngineStop),
+            DaemonCommand::SetBus { id, gain_db, mute } => {
+                daemon_request(l3o_daemon::ipc::Request::SetBusGain {
+                    id,
+                    gain_db,
+                    muted: mute,
+                })
+            }
+            DaemonCommand::SetSend {
+                id,
+                mix,
+                gain_db,
+                off,
+            } => daemon_request(l3o_daemon::ipc::Request::SetBusSend {
+                id,
+                mix: if mix == "monitor" {
+                    l3o_core::MixId::Monitor
+                } else {
+                    l3o_core::MixId::Stream
+                },
+                send: l3o_core::Send {
+                    enabled: !off,
+                    gain_db,
+                },
+            }),
+            DaemonCommand::SetMaster {
+                monitor_gain_db,
+                stream_gain_db,
+                monitor_mute,
+                stream_mute,
+            } => daemon_request(l3o_daemon::ipc::Request::SetMaster {
+                master: l3o_core::Master {
+                    monitor_gain_db,
+                    stream_gain_db,
+                    monitor_muted: monitor_mute,
+                    stream_muted: stream_mute,
+                },
+            }),
+        },
     }
 }
 

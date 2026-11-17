@@ -10,6 +10,7 @@ path = "src/main.rs"
 
 [dependencies]
 l3o-core = { path = "../l3o-core" }
+l3o-daemon = { path = "../l3o-daemon" }
 l3o-io = { path = "../l3o-io" }
 l3o-platform = { path = "../l3o-platform" }
 clap.workspace = true

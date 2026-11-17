@@ -11,19 +11,28 @@ The full design and roadmap live in [`master.md`](master.md).
 
 ## Status
 
-**M0 complete — foundations.**
+**Phase 1 code complete — secure real-time engine (hardware validation pending).**
 
 What works today:
 
 - Cargo workspace with eight crates and a Nix dev shell.
 - Output device enumeration and a click-free test tone (cpal 0.16).
 - Input/system/process enumeration (flexaudio 0.8.1).
-- Platform backend detection (PipeWire).
-- Mixer routing matrix: bus gain/mute, per-mix sends, master gains.
-- 23 unit tests, clippy-clean, formatted, license audit passing.
+- Mixer routing matrix with click-free, RT-safe control of every gain/mute/send
+  (bounded control queue, 10 ms ramps, zero allocation after preparation).
+- Capture → conversion → engine → output pipeline: sample-format conversion,
+  mono→stereo, device-rate resampling, partial blocks, overflow/underflow
+  counters, per-source stall recovery.
+- `l3od` daemon: user-session Unix socket (0600, same-user peers only),
+  versioned JSON protocol with size limits and timeouts, engine start/stop/
+  status, runtime gain/send/master control, live telemetry.
+- RUSTSEC-2026-0293 remediated via a reviewed fork of flexaudio-core with
+  ringbuf 0.6; `cargo deny check` is green with no suppressions.
+- 60+ tests, clippy-clean, formatted, CI runs fmt/clippy/tests/coverage/deny.
 
-Not implemented yet: real-time capture into the engine, per-bus effect chains,
-virtual sinks, IPC, GUI, macOS/Windows backends. See [Roadmap](#roadmap).
+Not implemented yet: per-bus effect chains, virtual sinks and per-app routing,
+GUI, packaging, macOS/Windows backends. Real-hardware smoke and soak runs are
+tracked in `docs/phase1-qa.md`. See [Roadmap](#roadmap).
 
 ---
 
@@ -386,7 +395,7 @@ null sink or an inactive profile.
 | Phase | Scope | Status |
 |---|---|---|
 | M0 | Workspace, dev shell, device/process discovery, test tone | **Done** |
-| M1 | Real-time engine: capture → mix → output, rings, drift, hotplug | Next |
+| M1 | Real-time engine: capture → mix → output, rings, drift, hotplug | **Code done** — hardware QA pending |
 | M2 | DSP v1: EQ, compressor, gate, limiter, mic chain | Planned |
 | M3 | Linux routing: null sinks per bus, app rules, `L3O Stream` | Planned |
 | M4 | Streamer Mode UI: sends, mutes, presets, shortcuts | Planned |
